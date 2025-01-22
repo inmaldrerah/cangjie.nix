@@ -2,8 +2,8 @@
 
 stdenv.mkDerivation rec {
   pname = "cangjie-unwrapped";
-  version = "0.55.3";
-  src = ./. + "/Cangjie-${version}-linux_x64.tar.gz";
+  version = "0.58.3";
+  src = ./. + "/cangjie-${version}-linux_x64.tar.gz";
   buildPhase = "";
   installPhase = ''
     runHook preInstall

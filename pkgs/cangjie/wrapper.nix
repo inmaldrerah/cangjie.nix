@@ -5,6 +5,7 @@ let
     name = "cangjie-env";
     targetPkgs = pkgs: with pkgs; [
       gcc-unwrapped
+      llvmPackages.libcxxClang
     ];
   }).fhsenv;
 in stdenv.mkDerivation {
@@ -24,6 +25,7 @@ in stdenv.mkDerivation {
     done
     makeWrapper ${cangjie-unwrapped}/bin/cjc $out/bin/cjc \
       --prefix PATH : ${lib.makeBinPath [ binutils ]} \
-      --add-flags "--sysroot ${fhsenv}"
+      --add-flags "--sysroot ${fhsenv}" \
+      --add-flags "-L ${fhsenv}/lib"
   '';
 }
