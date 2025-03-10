@@ -1,9 +1,20 @@
-{ lib, stdenv, glibc, binutils-unwrapped, gcc-unwrapped, openssl, zlib, autoPatchelfHook }:
-
-stdenv.mkDerivation rec {
+{ lib, stdenv, glibc, binutils-unwrapped, gcc-unwrapped, libffi, openssl, zlib, autoPatchelfHook, cjver, cjpkg ? ./. + "/cangjie-${cjver}-linux_x64.tar.gz" }:
+let
+  libffi-so-4-compat = stdenv.mkDerivation {
+    name = "libffi-so-4-compat";
+    dontUnpack = true;
+    buildInputs = [
+      libffi
+    ];
+    postInstall = ''
+      mkdir -p $out/lib
+      ln -s ${libffi}/lib/libffi.so $out/lib/libffi.so.4
+    '';
+  };
+in stdenv.mkDerivation rec {
   pname = "cangjie-unwrapped";
-  version = "0.58.3";
-  src = ./. + "/cangjie-${version}-linux_x64.tar.gz";
+  version = cjver;
+  src = cjpkg;
   buildPhase = "";
   installPhase = ''
     runHook preInstall
@@ -28,9 +39,10 @@ stdenv.mkDerivation rec {
     autoPatchelfHook
   ];
   buildInputs = [
-    zlib
     gcc-unwrapped.lib
     glibc
+    libffi-so-4-compat
     openssl
+    zlib
   ];
 }
