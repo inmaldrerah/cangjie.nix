@@ -11,6 +11,7 @@ let
   };
   makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);
   cangjiePkgs = makeCangjiePkgs [
+    { cjver = "0.53.18"; cjpkg = ./Cangjie-0.53.18-linux_x64.tar.gz; }
     { cjver = "0.55.3"; cjpkg = ./Cangjie-0.55.3-linux_x64.tar.gz; }
     { cjver = "0.56.4"; cjpkg = ./Cangjie-0.56.4-linux_x64.tar.gz; }
     { cjver = "0.58.3"; }
