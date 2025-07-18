@@ -17,8 +17,9 @@ let
     { cjver = "0.58.3"; }
     { cjver = "0.59.6"; }
     { cjver = "0.60.4-0518"; }
+    { cjver = "1.0.0"; cjpkg = ./cangjie-sdk-linux-x64-1.0.0.tar.gz; }
   ];
 in cangjiePkgs // {
-  cangjie-unwrapped = cangjiePkgs.cangjie-0_58_3-unwrapped;
-  cangjie = cangjiePkgs.cangjie-0_58_3;
+  cangjie-unwrapped = cangjiePkgs.cangjie-1_0_0-unwrapped;
+  cangjie = cangjiePkgs.cangjie-1_0_0;
 }
