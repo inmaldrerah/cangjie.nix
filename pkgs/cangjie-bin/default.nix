@@ -6,8 +6,8 @@ let
     unwrapped = pkgs.callPackage ./unwrapped.nix args;
     dotlessVer = replaceDots cjver;
   in rec {
-    "cangjie-${dotlessVer}-unwrapped" = unwrapped;
-    "cangjie-${dotlessVer}" = pkgs.callPackage ./wrapper.nix { cangjie-unwrapped = unwrapped; };
+    "cangjie-bin-${dotlessVer}-unwrapped" = unwrapped;
+    "cangjie-bin-${dotlessVer}" = pkgs.callPackage ./wrapper.nix { cangjie-unwrapped = unwrapped; };
   };
   makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);
   cangjiePkgs = makeCangjiePkgs [
@@ -20,6 +20,6 @@ let
     { cjver = "1.0.0"; cjpkg = ./cangjie-sdk-linux-x64-1.0.0.tar.gz; }
   ];
 in cangjiePkgs // {
-  cangjie-unwrapped = cangjiePkgs.cangjie-1_0_0-unwrapped;
-  cangjie = cangjiePkgs.cangjie-1_0_0;
+  cangjie-bin-unwrapped = cangjiePkgs.cangjie-bin-1_0_0-unwrapped;
+  cangjie-bin = cangjiePkgs.cangjie-bin-1_0_0;
 }

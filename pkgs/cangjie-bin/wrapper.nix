@@ -2,14 +2,14 @@
 
 let
   fhsenv = (buildFHSEnv {
-    name = "cangjie-env";
+    name = "cangjie-bin-env";
     targetPkgs = pkgs: with pkgs; [
       gcc-unwrapped
       llvmPackages.libcxxClang
     ];
   }).fhsenv;
 in stdenv.mkDerivation {
-  pname = "cangjie";
+  pname = "cangjie-bin";
   version = cangjie-unwrapped.version;
   nativeBuildInputs = [ makeWrapper ];
   dontUnpack = true;

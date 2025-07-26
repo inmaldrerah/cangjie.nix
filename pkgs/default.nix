@@ -1,2 +1,2 @@
 { pkgs ? import <nixpkgs> {} }:
-import ./cangjie { inherit pkgs; }
+import ./cangjie-bin { inherit pkgs; }

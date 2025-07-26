@@ -12,7 +12,7 @@ let
     '';
   };
 in stdenv.mkDerivation rec {
-  pname = "cangjie-unwrapped";
+  pname = "cangjie-bin-unwrapped";
   version = cjver;
   src = cjpkg;
   buildPhase = "";
