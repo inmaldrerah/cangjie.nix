@@ -16,7 +16,7 @@
           cangjiePkgs = import ./pkgs { inherit pkgs; };
         in [
           pkgs.binutils
-          pkgs.gcc-unwrapped
+          pkgs.gccNGPackages_15.gcc-unwrapped
           cangjiePkgs."cangjie-bin-${dotlessVer}-unwrapped"
         ];
       }).env;

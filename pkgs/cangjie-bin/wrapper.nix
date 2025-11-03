@@ -1,10 +1,15 @@
-{ stdenv, lib, binutils, cangjie-unwrapped, gcc-unwrapped, makeWrapper, buildFHSEnv }:
+{ stdenv, lib, binutils, cangjie-unwrapped, gccNGPackages_15, glibc, llvmPackages, makeWrapper, buildFHSEnv }:
 
 let
   fhsenv = (buildFHSEnv {
     name = "cangjie-bin-env";
     targetPkgs = pkgs: with pkgs; [
-      gcc-unwrapped
+      binutils
+      gccNGPackages_15.gcc-unwrapped
+      gccNGPackages_15.libatomic
+      gccNGPackages_15.libgcc
+      gccNGPackages_15.libssp
+      gccNGPackages_15.libstdcxx
       llvmPackages.libcxxClang
     ];
   }).fhsenv;
@@ -24,8 +29,7 @@ in stdenv.mkDerivation {
       fi
     done
     makeWrapper ${cangjie-unwrapped}/bin/cjc $out/bin/cjc \
-      --prefix PATH : ${lib.makeBinPath [ binutils ]} \
-      --add-flags "--sysroot ${fhsenv}" \
-      --add-flags "-L ${fhsenv}/lib"
+      --prefix PATH : "${fhsenv}/bin" \
+      --add-flags "--sysroot ${fhsenv}"
   '';
 }
