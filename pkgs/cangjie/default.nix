@@ -6,9 +6,55 @@ let
     { cjver, ... }@args:
     let
       dotlessVer = replaceDots cjver;
+      cangjie-compiler = pkgs.callPackage ./compiler.nix args;
+      cangjie-runtime = pkgs.callPackage ./runtime.nix ({ inherit cangjie-compiler; } // args);
+      cangjie-stdlib = pkgs.callPackage ./stdlib.nix (
+        { inherit cangjie-compiler cangjie-runtime; } // args
+      );
+      cangjie-unwrapped = pkgs.stdenvNoCC.mkDerivation {
+        pname = "cangjie";
+        version = cjver;
+        buildInputs = [
+          cangjie-compiler
+          cangjie-runtime
+          cangjie-stdlib
+        ];
+        dontUnpack = true;
+        dontPatch = true;
+        dontConfigure = true;
+        dontBuild = true;
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out
+          cd ${cangjie-compiler}
+          find . -type d -exec mkdir -p "$out/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/{}" \;
+          cd -
+          cd ${cangjie-runtime}/common/linux_release_*/lib
+          find . -type d -exec mkdir -p "$out/lib/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/lib/{}" \;
+          cd -
+          cd ${cangjie-runtime}/common/linux_release_*/runtime
+          find . -type d -exec mkdir -p "$out/runtime/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/runtime/{}" \;
+          cd -
+          cd ${cangjie-stdlib}
+          find . -type d -exec mkdir -p "$out/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/{}" \;
+          cd -
+          runHook postInstall
+        '';
+      };
+      cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-unwrapped; } // args);
+      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped; };
     in
     rec {
-      "cangjie-${dotlessVer}" = pkgs.callPackage ./cangjie.nix args;
+      "cangjie-${dotlessVer}-compiler" = cangjie-compiler;
+      "cangjie-${dotlessVer}-runtime" = cangjie-runtime;
+      "cangjie-${dotlessVer}-stdlib" = cangjie-stdlib;
+      "cangjie-${dotlessVer}-unwrapped" = cangjie-unwrapped;
+      "cangjie-${dotlessVer}-stdx" = cangjie-stdx;
+      "cangjie-${dotlessVer}" = cangjie;
     };
   makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);
   cangjiePkgs = makeCangjiePkgs [
@@ -71,11 +117,29 @@ let
           hash = "sha256-7T25HC25eSPtSs+K4h8Lnh9tdkTfwQHWRepXVOF1Dtw=";
           leaveDotGit = true;
         })
+        (pkgs.fetchgit {
+          name = "flatbuffers-release";
+          url = "https://gitcode.com/openharmony/third_party_flatbuffers.git";
+          rev = "OpenHarmony-v6.0-Release";
+          hash = "sha256-Z8xXh2ZkVpnLjCRNCfHyUTmxobjq/wS/OORaDZUqayI=";
+          leaveDotGit = true;
+        })
+        (pkgs.fetchgit {
+          name = "pcre2";
+          url = "https://gitee.com/openharmony/third_party_pcre2.git";
+          rev = "OpenHarmony-v6.0-Release";
+          hash = "sha256-PE16Hg9YLPZ+VEbyccbxA+NkXSGKOAraf0joXygEYoQ=";
+          leaveDotGit = true;
+        })
+        (pkgs.fetchgit {
+          name = "zlib";
+          url = "https://gitee.com/openharmony/third_party_zlib.git";
+          rev = "OpenHarmony-v6.0-Release";
+          hash = "sha256-wDh2WYc4cFRBUntUVsxeBVBbCOxORnUBTX2ncLNpWSg=";
+          leaveDotGit = true;
+        })
       ];
     }
   ];
 in
 cangjiePkgs
-// {
-  # cangjie = cangjiePkgs.cangjie-bin-1_0_0;
-}
