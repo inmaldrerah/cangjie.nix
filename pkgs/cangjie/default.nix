@@ -46,7 +46,7 @@ let
         '';
       };
       cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-toolless; } // args);
-      cangjie-toolless-wrapped = pkgs.callPackage ./wrapper.nix { inherit cangjie-toolless; };
+      cangjie-toolless-wrapped = pkgs.callPackage ./tools-wrapper.nix { inherit cangjie-toolless; };
       cangjie-tools = pkgs.callPackage ./tools.nix (
         { inherit cangjie-toolless cangjie-toolless-wrapped cangjie-stdx; } // args
       );

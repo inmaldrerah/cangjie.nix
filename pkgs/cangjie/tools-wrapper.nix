@@ -3,10 +3,8 @@
   lib,
   binutils,
   cangjie-toolless,
-  cangjie-tools ? null,
-  gccNGPackages_15,
   glibc,
-  llvmPackages,
+  gccNGPackages_15,
   makeWrapper,
   buildFHSEnv,
 }:
@@ -17,40 +15,20 @@ let
       name = "cangjie-env";
       targetPkgs =
         pkgs: with pkgs; [
-          glibc
           binutils
-          # gccNGPackages_15.gcc-unwrapped
-          # gccNGPackages_15.libatomic
+          glibc
           gccNGPackages_15.libgcc
-          # gccNGPackages_15.libssp
-          # gccNGPackages_15.libstdcxx
-          # llvmPackages.libcxxClang
         ];
     }).fhsenv;
 in
 stdenv.mkDerivation {
-  pname = "cangjie";
+  pname = "cangjie-tools-wrapper";
   version = cangjie-toolless.version;
   nativeBuildInputs = [ makeWrapper ];
   dontUnpack = true;
   postInstall = ''
     mkdir -p $out/bin
     ln -sf ${cangjie-toolless}/bin/cjc-frontend $out/bin/cjc-frontend
-  ''
-  + (
-    if cangjie-tools != null then
-      ''
-        for file in ${cangjie-tools}/bin/*; do
-          if [ -f "$file" ]; then
-            filename=$(basename "$file")
-            ln -sf "$file" "$out/bin/$filename"
-          fi
-        done
-      ''
-    else
-      ""
-  )
-  + ''
     makeWrapper ${cangjie-toolless}/bin/cjc $out/bin/cjc \
       --prefix PATH : "${fhsenv}/bin" \
       --add-flags "--sysroot ${fhsenv}"
