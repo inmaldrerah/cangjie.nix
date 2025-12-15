@@ -11,8 +11,8 @@ let
       cangjie-stdlib = pkgs.callPackage ./stdlib.nix (
         { inherit cangjie-compiler cangjie-runtime; } // args
       );
-      cangjie-unwrapped = pkgs.stdenvNoCC.mkDerivation {
-        pname = "cangjie";
+      cangjie-toolless = pkgs.stdenvNoCC.mkDerivation {
+        pname = "cangjie-toolless";
         version = cjver;
         buildInputs = [
           cangjie-compiler
@@ -45,15 +45,20 @@ let
           runHook postInstall
         '';
       };
-      cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-unwrapped; } // args);
-      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped; };
+      cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-toolless; } // args);
+      cangjie-toolless-wrapped = pkgs.callPackage ./wrapper.nix { inherit cangjie-toolless; };
+      cangjie-tools = pkgs.callPackage ./tools.nix (
+        { inherit cangjie-toolless cangjie-toolless-wrapped cangjie-stdx; } // args
+      );
+      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-toolless cangjie-tools; };
     in
     rec {
       "cangjie-${dotlessVer}-compiler" = cangjie-compiler;
       "cangjie-${dotlessVer}-runtime" = cangjie-runtime;
       "cangjie-${dotlessVer}-stdlib" = cangjie-stdlib;
-      "cangjie-${dotlessVer}-unwrapped" = cangjie-unwrapped;
+      "cangjie-${dotlessVer}-toolless" = cangjie-toolless;
       "cangjie-${dotlessVer}-stdx" = cangjie-stdx;
+      "cangjie-${dotlessVer}-tools" = cangjie-tools;
       "cangjie-${dotlessVer}" = cangjie;
     };
   makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);

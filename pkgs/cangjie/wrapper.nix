@@ -2,7 +2,8 @@
   stdenv,
   lib,
   binutils,
-  cangjie-unwrapped,
+  cangjie-toolless,
+  cangjie-tools ? null,
   gccNGPackages_15,
   glibc,
   llvmPackages,
@@ -28,20 +29,27 @@ let
 in
 stdenv.mkDerivation {
   pname = "cangjie";
-  version = cangjie-unwrapped.version;
+  version = cangjie-toolless.version;
   nativeBuildInputs = [ makeWrapper ];
   dontUnpack = true;
   postInstall = ''
     mkdir -p $out/bin || true
-    for file in ${cangjie-unwrapped}/bin/*; do
-      if [ -f "$file" ]; then
-        filename=$(basename "$file")
-        if [ "$filename" != "cjc" ]; then
-          ln -sf "$file" "$out/bin/$filename"
-        fi
-      fi
-    done
-    makeWrapper ${cangjie-unwrapped}/bin/cjc $out/bin/cjc \
+  ''
+  + (
+    if cangjie-tools != null then
+      ''
+        for file in ${cangjie-tools}/bin/*; do
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            ln -sf "$file" "$out/bin/$filename"
+          fi
+        done
+      ''
+    else
+      ""
+  )
+  + ''
+    makeWrapper ${cangjie-toolless}/bin/cjc $out/bin/cjc \
       --prefix PATH : "${fhsenv}/bin" \
       --add-flags "--sysroot ${fhsenv}"
   '';
