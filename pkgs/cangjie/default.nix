@@ -50,7 +50,47 @@ let
       cangjie-tools = pkgs.callPackage ./tools.nix (
         { inherit cangjie-toolless cangjie-toolless-wrapped cangjie-stdx; } // args
       );
-      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-toolless cangjie-tools; };
+      cangjie-unwrapped = pkgs.stdenvNoCC.mkDerivation {
+        pname = "cangjie-unwrapped";
+        version = cjver;
+        buildInputs = [
+          cangjie-compiler
+          cangjie-runtime
+          cangjie-stdlib
+          cangjie-tools
+        ];
+        dontUnpack = true;
+        dontPatch = true;
+        dontConfigure = true;
+        dontBuild = true;
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out
+          cd ${cangjie-compiler}
+          find . -type d -exec mkdir -p "$out/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/{}" \;
+          cd -
+          cd ${cangjie-runtime}/common/linux_release_*/lib
+          find . -type d -exec mkdir -p "$out/lib/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/lib/{}" \;
+          cd -
+          cd ${cangjie-runtime}/common/linux_release_*/runtime
+          find . -type d -exec mkdir -p "$out/runtime/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/runtime/{}" \;
+          cd -
+          cd ${cangjie-stdlib}
+          find . -type d -exec mkdir -p "$out/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/{}" \;
+          cd -
+          cd ${cangjie-tools}
+          find . -type d -exec mkdir -p "$out/tools/{}" \;
+          find . \( -type f -o -type l \) -exec cp -P "{}" "$out/tools/{}" \;
+          find "bin" -exec ln -s "../tools/{}" "$out/{}" \;
+          cd -
+          runHook postInstall
+        '';
+      };
+      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped cangjie-stdx; };
     in
     rec {
       "cangjie-${dotlessVer}-compiler" = cangjie-compiler;
@@ -59,6 +99,7 @@ let
       "cangjie-${dotlessVer}-toolless" = cangjie-toolless;
       "cangjie-${dotlessVer}-stdx" = cangjie-stdx;
       "cangjie-${dotlessVer}-tools" = cangjie-tools;
+      "cangjie-${dotlessVer}-unwrapped" = cangjie-unwrapped;
       "cangjie-${dotlessVer}" = cangjie;
     };
   makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);
