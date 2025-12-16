@@ -32,7 +32,7 @@ stdenv.mkDerivation {
     for file in ${cangjie-unwrapped}/bin/*; do
       if [ -f "$file" ]; then
         filename=$(basename "$file")
-        if [ $filename != "cjc" && $filename != "cjpm" ]; then
+        if [ $filename != "cjc" -a $filename != "cjpm" ]; then
           ln -sf "$file" "$out/bin/$filename"
         fi
       fi
