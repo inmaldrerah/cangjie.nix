@@ -83,7 +83,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     fi
   '';
   installPhase = ''
-    mkdir -p $out/bin $out/config
+    mkdir -p $out/bin $out/config $out/lib
     cp cangjie_tools/cjpm/dist/cjpm $out/bin/cjpm
     cp cangjie_tools/cjfmt/build/build/bin/cjfmt $out/bin/cjfmt
     cp cangjie_tools/cjfmt/config/*.toml $out/config/
