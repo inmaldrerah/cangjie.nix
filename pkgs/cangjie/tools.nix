@@ -88,9 +88,9 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     cp cangjie_tools/cjfmt/build/build/bin/cjfmt $out/bin/cjfmt
     cp cangjie_tools/cjfmt/config/*.toml $out/config/
     cp cangjie_tools/cangjie-language-server/output/bin/LSPServer $out/bin/LSPServer
-    cp cangjie_tools/cjlint/dist/cjlint $out/bin/cjlint
-    cp cangjie_tools/cjlint/config/*.json $out/config/
-    cp cangjie_tools/cjlint/lib/libcjlint.so $out/lib/libcjlint.so
+    cp cangjie_tools/cjlint/dist/bin/cjlint $out/bin/cjlint
+    cp cangjie_tools/cjlint/dist/config/*.json $out/config/
+    cp cangjie_tools/cjlint/dist/lib/libcjlint.so $out/lib/libcjlint.so
   '';
   ARCH = "x86_64";
   SDK_NAME = "linux-x64";
