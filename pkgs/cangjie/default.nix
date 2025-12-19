@@ -184,6 +184,13 @@ let
           hash = "sha256-wDh2WYc4cFRBUntUVsxeBVBbCOxORnUBTX2ncLNpWSg=";
           leaveDotGit = true;
         })
+        (pkgs.fetchgit {
+          name = "json";
+          url = "https://gitcode.com/openharmony/third_party_json.git";
+          rev = "OpenHarmony-v6.0-Release";
+          hash = "sha256-jptGvl7aqbz4XbY6EtyeZ3x9FYBTf1QYUOW3c4ufgyw=";
+          leaveDotGit = true;
+        })
       ];
     }
   ];
