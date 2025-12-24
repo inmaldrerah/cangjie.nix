@@ -54,15 +54,19 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   buildPhase = ''
     export WORKSPACE=$PWD
     export CMAKE_PREFIX_PATH=${libedit}:${ncurses6}
+    mkdir chir
     cd cangjie_stdx
     python3 build.py clean
-    python3 build.py build -t release "--include=$WORKSPACE/cangjie_compiler/include"
+    python3 build.py build -t release "--include=$WORKSPACE/cangjie_compiler/include" \
+      "--build-args=--save-temps=$WORKSPACE/chir"
     python3 build.py install
     export CANGJIE_STDX_PATH=$WORKSPACE/cangjie_stdx/target/linux_''${ARCH}_cjnative/static/stdx
     cd -
   '';
   installPhase = ''
     cp -R cangjie_stdx/target/linux_''${ARCH}_cjnative $out
+    mkdir -p $out/chir/stdx
+    cp chir/*.chir $out/chir/stdx
   '';
   ARCH = "x86_64";
   SDK_NAME = "linux-x64";
