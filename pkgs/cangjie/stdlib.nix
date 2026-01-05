@@ -2,7 +2,6 @@
   cjver,
   cjsrcs,
   pkgs,
-  lib,
   libedit,
   libxcrypt,
   openssl,
@@ -11,6 +10,9 @@
   cangjie-runtime,
   ...
 }:
+let
+  stdFolder = if cjver < "1.1" then "std" else "stdlib";
+in
 pkgs.llvmPackages.stdenv.mkDerivation {
   pname = "cangjie-stdlib";
   version = cjver;
@@ -38,12 +40,12 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     git
   ];
   postPatch = ''
-    git -C flatbuffers-release apply --whitespace=fix ../cangjie_runtime/std/third_party/flatbufferPatch.diff
+    git -C flatbuffers-release apply --whitespace=fix ../cangjie_runtime/${stdFolder}/third_party/flatbufferPatch.diff
     rm -r flatbuffers-release/.git
-    sed -i -e 's/-Werror/-Wno-error/g' cangjie_runtime/std/cmake/linux_toolchain.cmake
-    sed -i -e 's|third_party/boundscheck-[^)/]\+|third_party/boundscheck|g' cangjie_runtime/std/CMakeLists.txt
-    sed -i -e 's|third_party/boundscheck-[^)/]\+|third_party/boundscheck|g' cangjie_runtime/std/libs/CMakeLists.txt
-    sed -i -e 's|third_party/pcre2-[^)/]\+|third_party/pcre2|g' cangjie_runtime/std/CMakeLists.txt
+    sed -i -e 's/-Werror/-Wno-error/g' cangjie_runtime/${stdFolder}/cmake/linux_toolchain.cmake
+    sed -i -e 's|third_party/boundscheck-[^)/]\+|third_party/boundscheck|g' cangjie_runtime/${stdFolder}/CMakeLists.txt
+    sed -i -e 's|third_party/boundscheck-[^)/]\+|third_party/boundscheck|g' cangjie_runtime/${stdFolder}/libs/CMakeLists.txt
+    sed -i -e 's|third_party/pcre2-[^)/]\+|third_party/pcre2|g' cangjie_runtime/${stdFolder}/CMakeLists.txt
     # Find all .cpp and .hpp/.h files and add <stdint.h> if required
     find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) | while read f; do
       if grep -q -i -E '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' "$f" && ! grep -q -i -E '#include <(stdint.h|cstdint)>'; then
@@ -51,23 +53,23 @@ pkgs.llvmPackages.stdenv.mkDerivation {
       fi
     done
     # Create links after patching to avoid scanning files multiple times
-    ln -s ../../../flatbuffers-release cangjie_runtime/std/third_party/flatbuffers
-    ln -s ../../../libboundscheck cangjie_runtime/std/third_party/boundscheck
-    ln -s ../../../pcre2 cangjie_runtime/std/third_party/pcre2
+    ln -s ../../../flatbuffers-release cangjie_runtime/${stdFolder}/third_party/flatbuffers
+    ln -s ../../../libboundscheck cangjie_runtime/${stdFolder}/third_party/boundscheck
+    ln -s ../../../pcre2 cangjie_runtime/${stdFolder}/third_party/pcre2
   '';
   dontConfigure = true;
   buildPhase = ''
     export WORKSPACE=$PWD
     export CMAKE_PREFIX_PATH=${libedit}:${ncurses6}
     mkdir chir
-    cd cangjie_runtime/std
+    cd cangjie_runtime/${stdFolder}
     python3 build.py build -t release "--target-lib=${cangjie-runtime}" \
       "--build-args=--save-temps=$WORKSPACE/chir"
     python3 build.py install
     cd -
   '';
   installPhase = ''
-    cp -R cangjie_runtime/std/output $out
+    cp -R cangjie_runtime/${stdFolder}/output $out
     mkdir -p $out/chir/std
     cp -R chir/*.chir $out/chir/std
   '';
