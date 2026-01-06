@@ -96,15 +96,69 @@ let
       cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped cangjie-stdx; };
     in
     {
-      "cangjie-${dotlessVer}-compiler" = cangjie-compiler;
-      "cangjie-${dotlessVer}-runtime" = cangjie-runtime;
-      "cangjie-${dotlessVer}-stdlib" = cangjie-stdlib;
-      "cangjie-${dotlessVer}-toolless" = cangjie-toolless;
-      "cangjie-${dotlessVer}-stdx" = cangjie-stdx;
-      "cangjie-${dotlessVer}-tools" = cangjie-tools;
-      "cangjie-${dotlessVer}-unwrapped" = cangjie-unwrapped;
-      "cangjie-${dotlessVer}" = cangjie;
+      "cangjiePackages-${dotlessVer}" = {
+        compiler = cangjie-compiler;
+        runtime = cangjie-runtime;
+        stdlib = cangjie-stdlib;
+        stdx = cangjie-stdx;
+        tools = cangjie-tools;
+        cangjie-unwrapped = cangjie-toolless;
+        cangjie = cangjie-toolless-wrapped;
+        cangjie-all-unwrapped = cangjie-unwrapped;
+        cangjie-all = cangjie;
+      };
+      "cangjie-${dotlessVer}-unwrapped" = cangjie-toolless;
+      "cangjie-${dotlessVer}" = cangjie-toolless-wrapped;
+      "cangjie-all-${dotlessVer}-unwrapped" = cangjie-unwrapped;
+      "cangjie-all-${dotlessVer}" = cangjie;
+      "cangjie-tools-${dotlessVer}" = cangjie-tools;
     };
-  makeCangjiePkgs = argList: lib.mergeAttrsList (map makeCangjiePkg argList);
+  makeCangjiePkgs =
+    {
+      versions,
+      defaultVersion,
+      aliases,
+      ...
+    }:
+    let
+      merged = lib.mergeAttrsList (map makeCangjiePkg versions);
+      dotlessDefault = replaceDots defaultVersion;
+      defaultPackages = merged."cangjiePackages-${dotlessDefault}";
+    in
+    merged
+    // (lib.mergeAttrsList (
+      lib.mapAttrsToList (
+        aliasVer: origVer:
+        let
+          dotlessAlias = replaceDots aliasVer;
+          dotlessOrig = replaceDots origVer;
+          origPackages = merged."cangjiePackages-${dotlessOrig}";
+        in
+        {
+          "cangjiePackages-${dotlessAlias}" = origPackages;
+          "cangjie-${dotlessAlias}-unwrapped" = origPackages.cangjie-unwrapped;
+          "cangjie-${dotlessAlias}" = origPackages.cangjie;
+          "cangjie-all${dotlessAlias}-unwrapped" = origPackages.cangjie-all-unwrapped;
+          "cangjie-all${dotlessAlias}" = origPackages.cangjie-all;
+          "cangjie-tools${dotlessAlias}" = origPackages.tools;
+        }
+      ) aliases
+    ))
+    // {
+      cangjiePackages = defaultPackages;
+      inherit (defaultPackages)
+        cangjie-unwrapped
+        cangjie
+        cangjie-all-unwrapped
+        cangjie-all
+        ;
+    };
 in
-makeCangjiePkgs (pkgs.callPackage (import ./versions) { })
+makeCangjiePkgs {
+  versions = (pkgs.callPackage (import ./versions) { });
+  defaultVersion = "1.0.5";
+  aliases = {
+    "1.1.0" = "1.1.0-alpha.20260105020002";
+    "1.1.0-alpha" = "1.1.0-alpha.20260105020002";
+  };
+}
