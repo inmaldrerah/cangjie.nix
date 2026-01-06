@@ -1,8 +1,6 @@
 {
-  lib,
   stdenvNoCC,
   glibc,
-  binutils-unwrapped,
   gcc-unwrapped,
   libffi,
   openssl,
@@ -25,7 +23,7 @@ let
     '';
   };
 in
-stdenvNoCC.mkDerivation rec {
+stdenvNoCC.mkDerivation {
   pname = "cangjie-bin-unwrapped";
   version = cjver;
   src = cjpkg;

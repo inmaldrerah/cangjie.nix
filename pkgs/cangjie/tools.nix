@@ -20,6 +20,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     builtins.elem x.name [
       "cangjie_tools"
       "flatbuffers-release"
+      "sqlite3"
       "json"
     ]
   ) cjsrcs;
@@ -52,7 +53,11 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     ln -s ../../../json cangjie_tools/cjlint/third_party/json-v3.11.3
     sed -i -e 's/return str\.begin\.column < pos.column < str\.begin\.column + str\.value\.size();/return (str.begin.column < pos.column) \&\& (pos.column < str.begin.column + str.value.size());/' cangjie_tools/cangjie-language-server/src/languageserver/ArkServer.cpp
     sed -i -e 's/        generate_flat_header()/    generate_flat_header()/' cangjie_tools/cangjie-language-server/build/build.py
-  '';
+  ''
+  + (lib.optionalString (cjver >= "1.1") ''
+    ln -s ../../../sqlite3 cangjie_tools/cangjie-language-server/third_party/sqlite3
+    sed -i -e 's/        build_sqlite_amalgamation()/    build_sqlite_amalgamation()/' cangjie_tools/cangjie-language-server/build/build.py
+  '');
   dontConfigure = true;
   buildPhase = ''
     export WORKSPACE=$PWD
@@ -96,7 +101,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   SDK_NAME = "linux-x64";
   CANGJIE_VERSION = cjver;
   STDX_VERSION = "1";
-  OPENSSL_PATH = "${openssl}/lib";
+  OPENSSL_PATH = "${openssl.out}/lib";
   CANGJIE_HOME = "${cangjie-toolless}";
   CANGJIE_STDX_PATH = "${cangjie-stdx}/static/stdx";
 }

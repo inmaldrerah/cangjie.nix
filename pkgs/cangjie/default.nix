@@ -85,7 +85,10 @@ let
           cd ${cangjie-tools}
           find . -type d -exec mkdir -p "$out/tools/{}" \;
           find . \( -type f -o -type l \) -exec cp -P "{}" "$out/tools/{}" \;
-          find "bin" -exec ln -s "../tools/{}" "$out/{}" \;
+          cd -
+          mkdir -p $out/tools/bin
+          cd $out/tools
+          find bin -exec ln -s "../tools/{}" "$out/{}" \;
           cd -
           runHook postInstall
         '';

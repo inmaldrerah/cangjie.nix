@@ -2,7 +2,6 @@
   cjver,
   cjsrcs,
   pkgs,
-  lib,
   libedit,
   libxcrypt,
   openssl,
@@ -63,6 +62,6 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   SDK_NAME = "linux-x64";
   CANGJIE_VERSION = cjver;
   STDX_VERSION = "1";
-  OPENSSL_PATH = "${openssl}/lib";
+  OPENSSL_PATH = "${openssl.out}/lib";
   CANGJIE_HOME = "${cangjie-compiler}";
 }

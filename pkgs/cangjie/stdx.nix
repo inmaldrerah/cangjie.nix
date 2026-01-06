@@ -8,6 +8,7 @@
   openssl,
   ncurses6,
   cangjie-toolless,
+  useFlatbuffers ? (cjver >= "1.1"),
   ...
 }:
 pkgs.llvmPackages.stdenv.mkDerivation {
@@ -15,12 +16,15 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   version = cjver;
   srcs = builtins.filter (
     x:
-    builtins.elem x.name [
-      "cangjie_compiler"
-      "cangjie_stdx"
-      "libboundscheck"
-      "zlib"
-    ]
+    builtins.elem x.name (
+      [
+        "cangjie_compiler"
+        "cangjie_stdx"
+        "libboundscheck"
+        "zlib"
+      ]
+      ++ (lib.optional useFlatbuffers "flatbuffers")
+    )
   ) cjsrcs;
   sourceRoot = ".";
   buildInputs = [
@@ -49,7 +53,10 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     mkdir -p cangjie_stdx/third_party
     ln -s ../../libboundscheck cangjie_stdx/third_party/boundscheck
     ln -s ../../zlib cangjie_stdx/third_party/zlib
-  '';
+  ''
+  + (lib.optionalString useFlatbuffers ''
+    ln -s ../../flatbuffers cangjie_stdx/third_party/flatbuffers
+  '');
   dontConfigure = true;
   buildPhase = ''
     export WORKSPACE=$PWD
@@ -72,6 +79,6 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   SDK_NAME = "linux-x64";
   CANGJIE_VERSION = cjver;
   STDX_VERSION = "1";
-  OPENSSL_PATH = "${openssl}/lib";
+  OPENSSL_PATH = "${openssl.out}/lib";
   CANGJIE_HOME = "${cangjie-toolless}";
 }

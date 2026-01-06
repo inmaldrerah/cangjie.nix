@@ -1,51 +1,57 @@
 { pkgs, ... }:
 {
-  cjver = "1.0.5";
-  patchLLVM = true;
-  patchTinytoml = false;
+  cjver = "1.1.0-alpha.20260105020002";
+  patchLLVM = false;
+  patchTinytoml = true;
   cjdbDisablePython = false;
   cjsrcs = [
     (pkgs.fetchgit {
       name = "cangjie_compiler";
       url = "https://gitcode.com/Cangjie/cangjie_compiler.git";
-      rev = "v1.0.5";
-      hash = "sha256-3YlHhuOtzkpI+M009YesssRxX0EKs2rhdGqjsqfKgGQ=";
+      rev = "ce9cf482ce4c91238d0ad2c6c585ad717a9fc94e";
+      hash = "sha256-8IfI1MLXVOaLV29iHF79+bnm2Iq6WTVPKyKzWeCLjgs=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "cangjie_runtime";
       url = "https://gitcode.com/Cangjie/cangjie_runtime.git";
-      rev = "v1.0.5";
-      hash = "sha256-019QfcWPJm+8g8fy5W1VxnAMlnEj6Hqbh/uN33Ipz/E=";
+      rev = "899dd7cf77798ceab61cd672f606a058f1e5af19";
+      hash = "sha256-dbCvRZhdWDtglGH0KZdAqNwHTLbI/a6dswNFzEioWOY=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "cangjie_tools";
       url = "https://gitcode.com/Cangjie/cangjie_tools.git";
-      rev = "v1.0.5";
-      hash = "sha256-y3/HA6xb5UbzvtTIJqX4vzgcyyxRU5hchLCdZhK09hg=";
+      rev = "d88b44102b29ec92cee19a4fbb9090b9d639751b";
+      hash = "sha256-ef3DDj9iS9dxTs+0ADEeJ+YXKm2BSq1qyYi1JZt/Kcw=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "cangjie_stdx";
       url = "https://gitcode.com/Cangjie/cangjie_stdx.git";
-      rev = "v1.0.5";
-      hash = "sha256-GPBMMomCELCBruwsI06OHeJgA7nCd54Z9GlKRMh54wk=";
+      rev = "2238632798d226433f802232dc78d0148ffb7d80";
+      hash = "sha256-KYbMDi+m+nD6K0sOOGdJ9YTdcjaADAmBdmLHDpnjpOI=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "flatbuffers";
       url = "https://gitcode.com/openharmony/third_party_flatbuffers.git";
-      rev = "741ee53d0dbd826f0a35de2a4b0a2d096d95fc69";
-      hash = "sha256-vsssRW6aSRcL83vhH1QjLUXfAV3b6D6CSSC7htH6RrI=";
+      rev = "a28912875aa5e275f4b98d9145ac58131658f81a";
+      hash = "sha256-LeCn//ny4P01zgewIgKTvpZOSIqY8O3wg/HeSNQYq4U=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "llvm-project";
-      url = "https://gitee.com/openharmony/third_party_llvm-project.git";
-      rev = "5c68a1cb123161b54b72ce90e7975d95a8eaf2a4";
-      hash = "sha256-A8y23IWvE7uKdbWyp/7217kRviD/IUEORUimm7fd38Q=";
-      leaveDotGit = true;
+      url = "https://gitcode.com/Cangjie/llvm-project.git";
+      rev = "20dbe2768b30fd879c21a17627cce2255688a8b5";
+      hash = "sha256-spN6m/TepcRKxHWQpMW/gbW13Vk3wo4GueTvlCqOaIQ=";
+      leaveDotGit = true; # Required: used by git log
+    })
+    (pkgs.fetchgit {
+      name = "tinytoml";
+      url = "https://gitcode.com/src-openeuler/tinytoml.git";
+      rev = "openEuler-24.03-LTS-SP1";
+      hash = "sha256-ldnK4RUO/HjHCQaZ7IDBk5T8spoPGKMuZIVLWGAybWE=";
     })
     (pkgs.fetchgit {
       name = "libboundscheck";
@@ -87,6 +93,13 @@
       url = "https://gitcode.com/openharmony/third_party_json.git";
       rev = "OpenHarmony-v6.0-Release";
       hash = "sha256-jptGvl7aqbz4XbY6EtyeZ3x9FYBTf1QYUOW3c4ufgyw=";
+      leaveDotGit = true;
+    })
+    (pkgs.fetchgit {
+      name = "sqlite3";
+      url = "https://gitcode.com/openharmony/third_party_sqlite.git";
+      rev = "OpenHarmony-v6.0-Release";
+      hash = "sha256-4Upc3sUiO3TGXiNOhrrpXIT6TK2Fik+N1ZRSEiZqfMs=";
       leaveDotGit = true;
     })
   ];
