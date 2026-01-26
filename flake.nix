@@ -25,6 +25,7 @@
               [
                 pkgs.binutils
                 pkgs.gccNGPackages_15.gcc-unwrapped
+                pkgs.openssl
                 cangjiePkgs."cangjie-bin-${dotlessVer}-unwrapped"
               ];
           }).env;
@@ -43,7 +44,19 @@
       packages."x86_64-linux" = import ./pkgs { inherit pkgs; };
       defaultPackage."x86_64-linux" = packages."x86_64-linux".cangjie-bin;
       devShells."x86_64-linux" = makeFhses {
-        versions = lib.unique (lib.mapAttrsToList (name: value: value.version) packages."x86_64-linux");
+        versions = lib.unique (
+          lib.flatten (
+            lib.mapAttrsToList (
+              name: value:
+              if (value.pname or "") == "cangjie-bin-unwrapped" then
+                [
+                  value.version
+                ]
+              else
+                [ ]
+            ) packages."x86_64-linux"
+          )
+        );
       };
     };
 }

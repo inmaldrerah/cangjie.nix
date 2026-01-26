@@ -1,3 +1,5 @@
 /pkgs/cangjie-bin/Cangjie-*.tar.gz
 /pkgs/cangjie-bin/cangjie-*.tar.gz
+/pkgs/cangjie-bin/nightly/**
+!/pkgs/cangjie-bin/nightly/**/*.nix
 /result

@@ -4,6 +4,7 @@
   gcc-unwrapped,
   libffi,
   openssl,
+  python311,
   uutils-coreutils-noprefix,
   zlib,
   autoPatchelfHook,
@@ -56,6 +57,7 @@ stdenvNoCC.mkDerivation {
     glibc
     libffi-so-4-compat
     openssl
+    python311
     zlib
   ];
 }
