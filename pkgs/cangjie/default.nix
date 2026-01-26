@@ -11,8 +11,8 @@ let
       cangjie-stdlib = pkgs.callPackage ./stdlib.nix (
         { inherit cangjie-compiler cangjie-runtime; } // args
       );
-      cangjie-toolless = pkgs.stdenvNoCC.mkDerivation {
-        pname = "cangjie-toolless";
+      cangjie-unwrapped = pkgs.stdenvNoCC.mkDerivation {
+        pname = "cangjie-unwrapped";
         version = cjver;
         buildInputs = [
           cangjie-compiler
@@ -45,13 +45,13 @@ let
           runHook postInstall
         '';
       };
-      cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-toolless; } // args);
-      cangjie-toolless-wrapped = pkgs.callPackage ./tools-wrapper.nix { inherit cangjie-toolless; };
+      cangjie-stdx = pkgs.callPackage ./stdx.nix ({ inherit cangjie-unwrapped; } // args);
+      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped; };
       cangjie-tools = pkgs.callPackage ./tools.nix (
-        { inherit cangjie-toolless cangjie-toolless-wrapped cangjie-stdx; } // args
+        { inherit cangjie cangjie-unwrapped cangjie-stdx; } // args
       );
-      cangjie-unwrapped = pkgs.stdenvNoCC.mkDerivation {
-        pname = "cangjie-unwrapped";
+      cangjie-all-unwrapped = pkgs.stdenvNoCC.mkDerivation {
+        pname = "cangjie-with-tools-unwrapped";
         version = cjver;
         buildInputs = [
           cangjie-compiler
@@ -93,7 +93,9 @@ let
           runHook postInstall
         '';
       };
-      cangjie = pkgs.callPackage ./wrapper.nix { inherit cangjie-unwrapped cangjie-stdx; };
+      cangjie-all = pkgs.callPackage ./with-tools-wrapper.nix {
+        inherit cangjie-all-unwrapped cangjie-stdx;
+      };
     in
     {
       "cangjiePackages-${dotlessVer}" = {
@@ -102,15 +104,15 @@ let
         stdlib = cangjie-stdlib;
         stdx = cangjie-stdx;
         tools = cangjie-tools;
-        cangjie-unwrapped = cangjie-toolless;
-        cangjie = cangjie-toolless-wrapped;
-        cangjie-all-unwrapped = cangjie-unwrapped;
-        cangjie-all = cangjie;
+        cangjie-unwrapped = cangjie-unwrapped;
+        cangjie = cangjie;
+        cangjie-all-unwrapped = cangjie-all-unwrapped;
+        cangjie-all = cangjie-all;
       };
-      "cangjie-${dotlessVer}-unwrapped" = cangjie-toolless;
-      "cangjie-${dotlessVer}" = cangjie-toolless-wrapped;
-      "cangjie-all-${dotlessVer}-unwrapped" = cangjie-unwrapped;
-      "cangjie-all-${dotlessVer}" = cangjie;
+      "cangjie-${dotlessVer}-unwrapped" = cangjie-unwrapped;
+      "cangjie-${dotlessVer}" = cangjie;
+      "cangjie-all-${dotlessVer}-unwrapped" = cangjie-all-unwrapped;
+      "cangjie-all-${dotlessVer}" = cangjie-all;
       "cangjie-tools-${dotlessVer}" = cangjie-tools;
     };
   makeCangjiePkgs =

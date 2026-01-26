@@ -7,7 +7,7 @@
   libxcrypt,
   openssl,
   ncurses6,
-  cangjie-toolless,
+  cangjie-unwrapped,
   useFlatbuffers ? (cjver >= "1.1"),
   ...
 }:
@@ -32,7 +32,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     libxcrypt
     openssl
     ncurses6
-    cangjie-toolless
+    cangjie-unwrapped
   ];
   nativeBuildInputs = with pkgs; [
     cmake
@@ -80,5 +80,5 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   CANGJIE_VERSION = cjver;
   STDX_VERSION = "1";
   OPENSSL_PATH = "${openssl.out}/lib";
-  CANGJIE_HOME = "${cangjie-toolless}";
+  CANGJIE_HOME = "${cangjie-unwrapped}";
 }

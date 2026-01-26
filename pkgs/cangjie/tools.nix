@@ -5,10 +5,11 @@
   lib,
   libedit,
   libxcrypt,
-  openssl,
+  makeWrapper,
   ncurses6,
-  cangjie-toolless,
-  cangjie-toolless-wrapped,
+  openssl,
+  cangjie,
+  cangjie-unwrapped,
   cangjie-stdx,
   ...
 }:
@@ -30,10 +31,11 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     libxcrypt
     openssl
     ncurses6
-    cangjie-toolless-wrapped
+    cangjie
   ];
   nativeBuildInputs = with pkgs; [
     cmake
+    makeWrapper
     ninja
     python3
     git
@@ -60,11 +62,12 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   '');
   dontConfigure = true;
   buildPhase = ''
+    runHook preBuild
     export WORKSPACE=$PWD
     export CMAKE_PREFIX_PATH=${libedit}:${ncurses6}
     if [ ! -v NO_CJPM ]; then
       cd cangjie_tools/cjpm/build
-      python3 build.py build -t release --set-rpath ${cangjie-toolless}/runtime/lib/linux_''${ARCH}_cjnative
+      python3 build.py build -t release --set-rpath ${cangjie-unwrapped}/runtime/lib/linux_''${ARCH}_cjnative
       python3 build.py install
       cd -
     fi
@@ -86,22 +89,27 @@ pkgs.llvmPackages.stdenv.mkDerivation {
       python3 build.py install
       cd -
     fi
+    runHook postBuild
   '';
   installPhase = ''
+    runHook preInstall
     mkdir -p $out/bin $out/config $out/lib
-    cp cangjie_tools/cjpm/dist/cjpm $out/bin/cjpm
+    cp cangjie_tools/cjpm/dist/cjpm $out/bin/.cjpm
     cp cangjie_tools/cjfmt/build/build/bin/cjfmt $out/bin/cjfmt
     cp cangjie_tools/cjfmt/config/*.toml $out/config/
     cp cangjie_tools/cangjie-language-server/output/bin/LSPServer $out/bin/LSPServer
     cp cangjie_tools/cjlint/dist/bin/cjlint $out/bin/cjlint
     cp cangjie_tools/cjlint/dist/config/*.json $out/config/
     cp cangjie_tools/cjlint/dist/lib/libcjlint.so $out/lib/libcjlint.so
+    makeWrapper $out/bin/.cjpm $out/bin/cjpm \
+      --prefix LD_LIBRARY_PATH : "${openssl.out}/lib"
+    runHook postInstall
   '';
   ARCH = "x86_64";
   SDK_NAME = "linux-x64";
   CANGJIE_VERSION = cjver;
   STDX_VERSION = "1";
   OPENSSL_PATH = "${openssl.out}/lib";
-  CANGJIE_HOME = "${cangjie-toolless}";
+  CANGJIE_HOME = "${cangjie-unwrapped}";
   CANGJIE_STDX_PATH = "${cangjie-stdx}/static/stdx";
 }
