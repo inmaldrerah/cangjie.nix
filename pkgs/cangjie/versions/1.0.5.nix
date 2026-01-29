@@ -9,21 +9,21 @@
       name = "cangjie_compiler";
       url = "https://gitcode.com/Cangjie/cangjie_compiler.git";
       rev = "v1.0.5";
-      hash = "sha256-3YlHhuOtzkpI+M009YesssRxX0EKs2rhdGqjsqfKgGQ=";
+      hash = "sha256-7uGTmwx1kdPnyGaGm4/EiaYSOfbP5qSRUtULWD5Yn9s=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "cangjie_runtime";
       url = "https://gitcode.com/Cangjie/cangjie_runtime.git";
       rev = "v1.0.5";
-      hash = "sha256-019QfcWPJm+8g8fy5W1VxnAMlnEj6Hqbh/uN33Ipz/E=";
+      hash = "sha256-QRect8uvi0nkS2b/CIOXno4oH5iuvwkOjd1u5CpsoJs=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
       name = "cangjie_tools";
       url = "https://gitcode.com/Cangjie/cangjie_tools.git";
       rev = "v1.0.5";
-      hash = "sha256-y3/HA6xb5UbzvtTIJqX4vzgcyyxRU5hchLCdZhK09hg=";
+      hash = "sha256-Mu97lf84CaP6VVtB6RHmgP2WqyInLasLkM9QR3FxgY4=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
@@ -37,7 +37,7 @@
       name = "flatbuffers";
       url = "https://gitcode.com/openharmony/third_party_flatbuffers.git";
       rev = "741ee53d0dbd826f0a35de2a4b0a2d096d95fc69";
-      hash = "sha256-vsssRW6aSRcL83vhH1QjLUXfAV3b6D6CSSC7htH6RrI=";
+      hash = "sha256-gyJTj4UKNUrDZrWaJACmK26lwhLHmOVHFDAgb5Jnt1I=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
@@ -65,7 +65,7 @@
       name = "flatbuffers-release";
       url = "https://gitcode.com/openharmony/third_party_flatbuffers.git";
       rev = "OpenHarmony-v6.0-Release";
-      hash = "sha256-Z8xXh2ZkVpnLjCRNCfHyUTmxobjq/wS/OORaDZUqayI=";
+      hash = "sha256-6Y35qGqpLCRtMbkO3862XI/7e0CK7Uc27F4O3HwbWCE=";
       leaveDotGit = true;
     })
     (pkgs.fetchgit {
