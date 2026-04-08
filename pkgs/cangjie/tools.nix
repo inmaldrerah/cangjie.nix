@@ -5,6 +5,7 @@
   lib,
   libedit,
   libxcrypt,
+  llvm,
   makeWrapper,
   ncurses6,
   openssl,
@@ -29,6 +30,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   buildInputs = [
     libedit
     libxcrypt
+    llvm
     openssl
     ncurses6
     cangjie
@@ -89,6 +91,12 @@ pkgs.llvmPackages.stdenv.mkDerivation {
       python3 build.py install
       cd -
     fi
+    if [ ! -v NO_CJCOV ]; then
+      cd cangjie_tools/cjcov/build
+      python3 build.py build -t release
+      python3 build.py install
+      cd -
+    fi
     runHook postBuild
   '';
   installPhase = ''
@@ -101,6 +109,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     cp cangjie_tools/cjlint/dist/bin/cjlint $out/bin/cjlint
     cp cangjie_tools/cjlint/dist/config/*.json $out/config/
     cp cangjie_tools/cjlint/dist/lib/libcjlint.so $out/lib/libcjlint.so
+    cp cangjie_tools/cjcov/dist/cjcov $out/bin/.cjcov
     makeWrapper $out/bin/.cjpm $out/bin/cjpm \
       --prefix LD_LIBRARY_PATH : "${openssl.out}/lib"
     runHook postInstall
