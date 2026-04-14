@@ -38,6 +38,10 @@ let
       cjpkg = ./cangjie-sdk-linux-x64-1.0.3.tar.gz;
     }
     {
+      cjver = "1.0.5";
+      cjpkg = ./cangjie-sdk-linux-x64-1.0.5.tar.gz;
+    }
+    {
       cjver = "1.1.0-alpha.20260123";
       cjpkg = ./nightly/20260123/cangjie-sdk-linux-x64-1.1.0-alpha.20260123020001.tar.gz;
     }
