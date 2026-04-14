@@ -25,6 +25,11 @@
               [
                 pkgs.binutils
                 pkgs.gccNGPackages_15.gcc-unwrapped
+                pkgs.gccNGPackages_15.libatomic
+                pkgs.gccNGPackages_15.libgcc
+                pkgs.gccNGPackages_15.libssp
+                pkgs.gccNGPackages_15.libstdcxx
+                pkgs.llvmPackages.libcxxClang
                 pkgs.openssl
                 cangjiePkgs."cangjie-bin-${dotlessVer}-unwrapped"
               ];
