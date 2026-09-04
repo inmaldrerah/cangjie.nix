@@ -44,11 +44,14 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   ];
   postPatch = ''
     # Find all .cpp and .hpp/.h files and add <stdint.h> if required
-    find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) | while read f; do
-      if grep -q -i -E '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' "$f" && ! grep -q -i -E '#include <(stdint.h|cstdint)>'; then
+    grep -rlE --include="*.cpp" --include="*.hpp" --include="*.h" \
+      -e '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' . \
+      > /tmp/needs_stdint 2>/dev/null || true
+    while IFS= read -r f; do
+      if ! grep -q -i -E '#include <(stdint.h|cstdint)>' "$f"; then
         sed -i -e "1i #include <stdint.h>\n" "$f"
       fi
-    done
+    done < /tmp/needs_stdint
     mkdir -p cangjie_tools/cangjie-language-server/third_party
     mkdir -p cangjie_tools/cjlint/third_party
     ln -s ../../../flatbuffers-release cangjie_tools/cangjie-language-server/third_party/flatbuffers

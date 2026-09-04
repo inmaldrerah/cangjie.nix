@@ -37,6 +37,7 @@ stdenv.mkDerivation {
       --prefix PATH : "${fhsenv}/bin" \
       --add-flags "--sysroot ${fhsenv}"
     makeWrapper ${cangjie-all-unwrapped}/bin/cjpm $out/bin/cjpm \
+      --prefix PATH : "$out/bin" \
       --set-default CANGJIE_STDX_PATH "${cangjie-stdx}/static/stdx"
   '';
 }

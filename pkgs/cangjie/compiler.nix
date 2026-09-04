@@ -62,12 +62,26 @@ pkgs.llvmPackages.stdenv.mkDerivation {
     '')
     + ''
       sed -i -e 's/-Werror/-Wno-error/g' cangjie_compiler/cmake/linux_toolchain.cmake
+      sed -i -e 's|git log -1 --oneline --decorate|echo cangjie-llvm|' cangjie_compiler/third_party/CMakeLists.txt
+      # linux/scc.h removed in newer kernel headers; guard it in compiler-rt (structs are unused)
+      sed -i -e 's|^#include <linux/scc.h>$|#if __has_include(<linux/scc.h>)\n#include <linux/scc.h>\n#endif|' \
+        llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
+      sed -i -e 's|^  unsigned struct_scc_modem_sz = sizeof(struct scc_modem);$|#if __has_include(<linux/scc.h>)\n  unsigned struct_scc_modem_sz = sizeof(struct scc_modem);|' \
+        llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
+      sed -i -e 's|^  unsigned struct_scc_stat_sz = sizeof(struct scc_stat);$|  unsigned struct_scc_stat_sz = sizeof(struct scc_stat);\n#endif|' \
+        llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
+      # struct termio removed in glibc 2.42+; define a compat (function scope shadows any glibc one)
+      sed -i -e '/^  unsigned struct_termio_sz = sizeof(struct termio);$/i\  struct termio { unsigned short c_iflag, c_oflag, c_cflag, c_lflag; unsigned char c_line; unsigned char c_cc[8]; };' \
+        llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cpp
       # Find all .cpp and .hpp/.h files and add <stdint.h> if required
-      find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) | while read f; do
-        if grep -q -i -E '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' "$f" && ! grep -q -i -E '#include <(stdint.h|cstdint)>'; then
+      grep -rlE --include="*.cpp" --include="*.hpp" --include="*.h" \
+        -e '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' . \
+        > /tmp/needs_stdint 2>/dev/null || true
+      while IFS= read -r f; do
+        if ! grep -q -i -E '#include <(stdint.h|cstdint)>' "$f"; then
           sed -i -e "1i #include <stdint.h>\n" "$f"
         fi
-      done
+      done < /tmp/needs_stdint
       # Create links after patching to avoid scanning files multiple times
       ln -s ../../flatbuffers cangjie_compiler/third_party/flatbuffers
       ln -s ../../llvm-project cangjie_compiler/third_party/llvm-project

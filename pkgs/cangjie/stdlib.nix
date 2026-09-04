@@ -46,7 +46,7 @@ pkgs.llvmPackages.stdenv.mkDerivation {
   postPatch =
     (lib.optionalString patchFlatbuffers ''
       git -C flatbuffers-release apply --whitespace=fix ../cangjie_runtime/${stdFolder}/third_party/flatbufferPatch.diff
-      rm -r flatbuffers-release/.git
+      rm -rf flatbuffers-release/.git
     '')
     + (lib.optionalString patchLibASTCopy ''
       sed -i '/COMMAND[[:space:]]\+''${TARGET_AR}[[:space:]]\+q[[:space:]]\+''${AST_FFI_LIB}/i\
@@ -59,11 +59,14 @@ pkgs.llvmPackages.stdenv.mkDerivation {
       sed -i -e 's|third_party/boundscheck-[^)/]\+|third_party/boundscheck|g' cangjie_runtime/${stdFolder}/libs/CMakeLists.txt
       sed -i -e 's|third_party/pcre2-[^)/]\+|third_party/pcre2|g' cangjie_runtime/${stdFolder}/CMakeLists.txt
       # Find all .cpp and .hpp/.h files and add <stdint.h> if required
-      find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) | while read f; do
-        if grep -q -i -E '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' "$f" && ! grep -q -i -E '#include <(stdint.h|cstdint)>'; then
+      grep -rlE --include="*.cpp" --include="*.hpp" --include="*.h" \
+        -e '(u?int|float)(_fast|_least|max|ptr)?[0-9]*_(t|min|max)' . \
+        > /tmp/needs_stdint 2>/dev/null || true
+      while IFS= read -r f; do
+        if ! grep -q -i -E '#include <(stdint.h|cstdint)>' "$f"; then
           sed -i -e "1i #include <stdint.h>\n" "$f"
         fi
-      done
+      done < /tmp/needs_stdint
       # Create links after patching to avoid scanning files multiple times
       ln -s ../../../${flatbuffersFolder} cangjie_runtime/${stdFolder}/third_party/flatbuffers
       ln -s ../../../libboundscheck cangjie_runtime/${stdFolder}/third_party/boundscheck
